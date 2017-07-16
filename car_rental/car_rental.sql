@@ -1,0 +1,95 @@
+DROP SCHEMA IF EXISTS car_rental;
+CREATE SCHEMA IF NOT EXISTS car_rental ;
+USE car_rental ;
+
+CREATE TABLE IF NOT EXISTS country (
+  country_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  country VARCHAR(50) NOT NULL,
+  last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY  (country_id)
+);
+
+CREATE TABLE IF NOT EXISTS city (
+  city_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  city VARCHAR(50) NOT NULL,
+  country_id SMALLINT UNSIGNED NOT NULL,
+  last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY  (city_id),
+  KEY idx_fk_country_id (country_id),
+  CONSTRAINT fk_city_country FOREIGN KEY (country_id) REFERENCES country (country_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS address (
+  address_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  address VARCHAR(50) NOT NULL,
+  address2 VARCHAR(50) DEFAULT NULL,
+  district VARCHAR(20) NOT NULL,
+  city_id SMALLINT UNSIGNED NOT NULL,
+  postal_code VARCHAR(10) DEFAULT NULL,
+  phone VARCHAR(20) NOT NULL,
+  last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY  (address_id),
+  KEY idx_fk_city_id (city_id),
+  CONSTRAINT fk_address_city FOREIGN KEY (city_id) REFERENCES city (city_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS customer (
+  customer_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  first_name VARCHAR(45) NOT NULL,
+  last_name VARCHAR(45) NOT NULL,
+  mobile_no VARCHAR(20) NOT NULL,
+  email VARCHAR(50) DEFAULT NULL,
+  address_id SMALLINT UNSIGNED NOT NULL,
+  create_date DATETIME NOT NULL,
+  last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY  (customer_id),
+  KEY idx_fk_address_id (address_id),
+  KEY idx_last_name (last_name),
+  CONSTRAINT fk_customer_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS driver (
+  driver_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  first_name VARCHAR(45) NOT NULL,
+  last_name VARCHAR(45) NOT NULL,
+  mobile_no VARCHAR(20) NOT NULL,
+  address_id SMALLINT UNSIGNED NOT NULL,
+  salary INT NOT NULL,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY  (driver_id),
+  KEY idx_fk_address_id (address_id),
+  CONSTRAINT fk_driver_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+CREATE TABLE IF NOT EXISTS car (
+  car_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  car_name VARCHAR(50) NOT NULL,
+  no_of_seats SMALLINT NOT NULL,
+  rate SMALLINT NOT NULL,
+  minimum_km SMALLINT NULL ,
+  last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY  (car_id)
+);
+CREATE TABLE IF NOT EXISTS car_driver(
+  car_id SMALLINT UNSIGNED NOT NULL,
+  driver_id SMALLINT UNSIGNED NOT NULL,
+  PRIMARY KEY  (car_id,driver_id),
+  KEY idx_fk_driver_id (driver_id),
+  KEY idx_fk_car_id (car_id),
+  CONSTRAINT fk_car_driver_driver_id FOREIGN KEY (driver_id) REFERENCES driver (driver_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_car_driver_car_id FOREIGN KEY (car_id) REFERENCES car (car_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  );
+CREATE TABLE booking(
+	book_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  car_id SMALLINT UNSIGNED NOT NULL,
+  driver_id SMALLINT UNSIGNED NOT NULL,
+	book_from VARCHAR(45) NOT NULL,
+	book_to VARCHAR(45) NOT NULL,
+	book_date DATETIME NOT NULL,
+  PRIMARY KEY  (book_id),
+  KEY idx_fk_driver_id (driver_id),
+  KEY idx_fk_car_id (car_id),
+  CONSTRAINT fk_booking_driver_id FOREIGN KEY (driver_id) REFERENCES driver (driver_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_booking_car_id FOREIGN KEY (car_id) REFERENCES car (car_id) ON DELETE RESTRICT ON UPDATE CASCADE
+ 
+)
