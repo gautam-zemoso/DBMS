@@ -65,14 +65,30 @@ CREATE TABLE IF NOT EXISTS customer (
   mobile_no VARCHAR(20) NOT NULL,
   email VARCHAR(50) DEFAULT NULL,
   address_id SMALLINT UNSIGNED NOT NULL,
+  order_id SMALLINT UNSIGNED NOT NULL,
   created_timestamp DATETIME NOT NULL, 
   created_by_id INT NOT NULL, 
 	modified_by_id INT DEFAULT NULL, 
   last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY  (customer_id),
   KEY idx_fk_address_id (address_id),
-  KEY idx_last_name (last_name),
+  KEY idx_last_name (order_id),
   CONSTRAINT fk_customer_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS orders(
+  order_id SMALLINT UNSIGNED NOT NULL,
+  order_date DATETIME NOT NULL,
+  order_status ENUM('dispatched', 'shipped', 'delivered') NOT NULL,
+  delivered_date DATETIME  NULL,
+  order_no SMALLINT UNSIGNED NOT NULL,
+  created_timestamp DATETIME NOT NULL, 
+  created_by_id INT NOT NULL, 
+  modified_by_id INT DEFAULT NULL, 
+  last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (order_id),
+  KEY idx_fk_customer_id (order_id),
+  CONSTRAINT fk_order_customer FOREIGN KEY (order_id) REFERENCES customer (order_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS items(
@@ -80,13 +96,14 @@ CREATE TABLE IF NOT EXISTS items(
 	supplier_id SMALLINT UNSIGNED NOT NULL,
 	name VARCHAR(45) NOT NULL,
 	description TEXT NULL,
+  count SMALLINT UNSIGNED NULL ,
 	price DECIMAL(8,2) NOT NULL,
 	discount DECIMAL(4,2)  NULL,
 	manufactured_date DATE NULL,
 	expire_date DATE NULL,
 	item_avilable  BOOLEAN NOT NULL DEFAULT TRUE,
 	discount_avilable BOOLEAN NOT NULL DEFAULT FALSE,
-    created_timestamp DATETIME NOT NULL, 
+  created_timestamp DATETIME NOT NULL, 
 	created_by_id INT NOT NULL, 
 	modified_by_id INT DEFAULT NULL, 
 	last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -96,48 +113,16 @@ CREATE TABLE IF NOT EXISTS items(
 );
 
 
-
-CREATE TABLE IF NOT EXISTS orders(
-	order_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	order_date DATETIME NOT NULL,
-	order_status ENUM('dispatched', 'shipped', 'delivered') NOT NULL,
-	delivered_date DATETIME  NULL,
-    created_timestamp DATETIME NOT NULL, 
-	created_by_id INT NOT NULL, 
-	modified_by_id INT DEFAULT NULL, 
-	last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	PRIMARY KEY (order_id)
-);
-
-CREATE TABLE IF NOT EXISTS customer_orders(
-	order_id SMALLINT UNSIGNED NOT NULL,
-	customer_id SMALLINT UNSIGNED NOT NULL,
-  	created_timestamp DATETIME NOT NULL, 
-	created_by_id INT NOT NULL, 
-	modified_by_id INT DEFAULT NULL, 
-	last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	PRIMARY KEY (order_id,customer_id),
-	KEY idx_fk_customer_id (customer_id),
-    KEY idx_fk_order_id (order_id),
-	CONSTRAINT fk_order_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT fk_order_order FOREIGN KEY (order_id) REFERENCES orders (order_id) ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS order_details(
-  order_detail_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
   order_id SMALLINT UNSIGNED NOT NULL,
   item_id VARCHAR(45) NOT NULL,
-  order_no SMALLINT UNSIGNED NOT NULL,
-  price DECIMAL(8,2) NOT NULL,
   quantity SMALLINT NOT NULL,
-  total DECIMAL(12,2) NOT NULL,
   created_timestamp DATETIME NOT NULL, 
-	created_by_id INT NOT NULL, 
-	modified_by_id INT DEFAULT NULL, 
-	last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (order_detail_id),
+  created_by_id INT NOT NULL, 
+  modified_by_id INT DEFAULT NULL, 
+  last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   KEY idx_fk_order_id (order_id),
   KEY idx_fk_item_id (item_id),
-  CONSTRAINT fk_order_details_order FOREIGN KEY (order_id) REFERENCES orders (order_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_order_details_item FOREIGN KEY (item_id) REFERENCES items (item_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_order_details_item FOREIGN KEY (item_id) REFERENCES items (item_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_order_details_orders FOREIGN KEY (order_id) REFERENCES orders (order_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
