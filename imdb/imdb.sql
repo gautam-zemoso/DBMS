@@ -27,6 +27,7 @@ CREATE TABLE actor (
 
 CREATE TABLE movie (
   movie_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  actor_id SMALLINT UNSIGNED NOT NULL,
   title VARCHAR(255) NOT NULL,
   description TEXT DEFAULT NULL,
   release_year YEAR DEFAULT NULL,
@@ -41,24 +42,14 @@ CREATE TABLE movie (
   PRIMARY KEY  (movie_id),
   KEY idx_title (title),
   KEY idx_fk_language_id (language_id),
+  KEY idx_fk_actor_id (actor_id),
+  CONSTRAINT fk_movie_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT fk_film_language FOREIGN KEY (language_id) REFERENCES language (language_id) ON DELETE RESTRICT ON UPDATE CASCADE
-);
-
-CREATE TABLE movie_actor (
-  actor_id SMALLINT UNSIGNED NOT NULL,
-  movie_id SMALLINT UNSIGNED NOT NULL,
-  created_timestamp DATETIME NOT NULL, 
-  created_by_id INT NOT NULL, 
-  modified_by_id INT DEFAULT NULL,
-  last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY  (actor_id,movie_id),
-  KEY idx_fk_movie_id (movie_id),
-  CONSTRAINT fk_movie_actor_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_movie_actor_film FOREIGN KEY (movie_id) REFERENCES movie (movie_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE tv_series (
   tv_series_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  actor_id SMALLINT UNSIGNED NOT NULL,
   title VARCHAR(255) NOT NULL,
   description TEXT  NULL,
   release_year YEAR  NULL,
@@ -73,7 +64,9 @@ CREATE TABLE tv_series (
   PRIMARY KEY  (tv_series_id),
   KEY idx_title (title),
   KEY idx_fk_language_id (language_id),
-  CONSTRAINT fk_tv_series_language FOREIGN KEY (language_id) REFERENCES language (language_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  KEY idx_fk_actor_id (actor_id),
+  CONSTRAINT fk_tv_series_language FOREIGN KEY (language_id) REFERENCES language (language_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_tv_series_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 CREATE TABLE episode(
@@ -88,16 +81,4 @@ CREATE TABLE episode(
     PRIMARY KEY (episode_no,tv_series_id),
     KEY idx_title (title),
     CONSTRAINT fk_season_tv_series FOREIGN KEY (tv_series_id) REFERENCES tv_series (tv_series_id) ON DELETE RESTRICT ON UPDATE CASCADE
-);
-CREATE TABLE tv_series_actor (
-  actor_id SMALLINT UNSIGNED NOT NULL,
-  tv_series_id SMALLINT UNSIGNED NOT NULL,
-  created_timestamp DATETIME NOT NULL, 
-  created_by_id INT NOT NULL, 
-  modified_by_id INT DEFAULT NULL,
-  last_update TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY  (actor_id,tv_series_id),
-  KEY idx_fk_tv_series_id (tv_series_id),
-  CONSTRAINT fk_tv_series_actor_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT fk_tv_series_actor_tv_series FOREIGN KEY (tv_series_id) REFERENCES tv_series (tv_series_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
