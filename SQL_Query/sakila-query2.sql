@@ -11,16 +11,14 @@ WHERE name='Documentary'
 \! echo "Number of sci-fi movies rented by the store managed by Jon Stephens";
 
 SELECT count(DISTINCT film.film_id) AS Total_Film
-FROM film_category
-INNER JOIN film ON film_category.film_id = film.film_id
+FROM film_category as fc
+INNER JOIN category as c ON fc.category_id = c.category_id
+INNER JOIN film ON fc.film_id = film.film_id
 INNER JOIN inventory ON film.film_id = inventory.film_id
 INNER JOIN rental ON rental.inventory_id = inventory.inventory_id
 INNER JOIN staff ON staff.staff_id = rental.staff_id
 INNER JOIN store ON staff.store_id = store.store_id
-WHERE category_id IN
-    (SELECT DISTINCT category_id
-     FROM category
-     WHERE name='Sci-Fi')
+WHERE c.name='Sci-Fi'
   AND first_name = 'Jon'
   AND last_name = 'Stephens' ;
 
@@ -32,7 +30,7 @@ FROM payment AS p
 INNER JOIN rental ON p.rental_id = rental.rental_id
 INNER JOIN inventory ON rental.inventory_id = inventory.inventory_id
 INNER JOIN film ON inventory.film_id = film.film_id
-INNER JOIN film_category ON film.film_id = film_category.film_id
+INNER JOIN film_category as fc ON film.film_id = fc.film_id
 INNER JOIN category AS c ON film_category.category_id = c.category_id
 WHERE c.name = 'Animation';
 
@@ -44,7 +42,7 @@ WHERE c.name = 'Animation';
 SELECT c.name,
        count(rental_id) AS rented
 FROM film
-INNER JOIN film_category fc ON film.film_id =fc.film_id
+INNER JOIN film_category as fc ON film.film_id =fc.film_id
 INNER JOIN category AS c ON fc.category_id = c.category_id
 INNER JOIN inventory ON film.film_id = inventory.film_id
 INNER JOIN rental ON rental.inventory_id = inventory.inventory_id
