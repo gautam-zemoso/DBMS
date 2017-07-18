@@ -49,13 +49,13 @@ CREATE TABLE IF NOT EXISTS suppliers(
 	contact_last_name VARCHAR(45) NULL,
 	address_id SMALLINT UNSIGNED NOT NULL,
 	mobile_no VARCHAR(45) NULL,
-    created_timestamp DATETIME NOT NULL, 
+  created_timestamp DATETIME NOT NULL, 
 	created_by_id INT NOT NULL, 
 	modified_by_id INT DEFAULT NULL, 
 	last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY  (supplier_id),
 	KEY idx_fk_address_id (address_id),
-    CONSTRAINT fk_supplier_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT fk_supplier_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
 
 );
 CREATE TABLE IF NOT EXISTS customer (
@@ -65,14 +65,12 @@ CREATE TABLE IF NOT EXISTS customer (
   mobile_no VARCHAR(20) NOT NULL,
   email VARCHAR(50) DEFAULT NULL,
   address_id SMALLINT UNSIGNED NOT NULL,
-  order_id SMALLINT UNSIGNED NOT NULL,
   created_timestamp DATETIME NOT NULL, 
   created_by_id INT NOT NULL, 
 	modified_by_id INT DEFAULT NULL, 
   last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY  (customer_id),
   KEY idx_fk_address_id (address_id),
-  KEY idx_last_name (order_id),
   CONSTRAINT fk_customer_address FOREIGN KEY (address_id) REFERENCES address (address_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -86,11 +84,22 @@ CREATE TABLE IF NOT EXISTS orders(
   created_by_id INT NOT NULL, 
   modified_by_id INT DEFAULT NULL, 
   last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (order_id),
-  KEY idx_fk_customer_id (order_id),
-  CONSTRAINT fk_order_customer FOREIGN KEY (order_id) REFERENCES customer (order_id) ON DELETE RESTRICT ON UPDATE CASCADE
+  PRIMARY KEY (order_id)
 );
+CREATE TABLE IF NOT EXISTS customer_order(
+  customer_id SMALLINT UNSIGNED NOT NULL,
+  order_id SMALLINT UNSIGNED NOT NULL,
+  created_timestamp DATETIME NOT NULL, 
+  created_by_id INT NOT NULL, 
+  modified_by_id INT DEFAULT NULL, 
+  last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT uk_customer_id UNIQUE(customer_id),
+  CONSTRAINT UNIQUE uk_order_id (order_id),
+  
+  CONSTRAINT fk_customer_order_orders FOREIGN KEY (order_id) REFERENCES orders (order_id) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT fk_customer_order_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE RESTRICT ON UPDATE CASCADE
 
+);
 CREATE TABLE IF NOT EXISTS items(
 	item_id VARCHAR(45) NOT NULL,
 	supplier_id SMALLINT UNSIGNED NOT NULL,
