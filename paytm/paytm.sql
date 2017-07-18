@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS customer_account_branch(
   KEY fk_account_no (account_no),
   KEY fk_branch_name(IFSC),
   KEY fk_customer_name(customer_id),
+  CONSTRAINT uk_customer_account_branch UNIQUE (account_no,IFSC,customer_id),
   CONSTRAINT fk_customer_account_branch_branch FOREIGN KEY (IFSC) REFERENCES branch (IFSC) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT fk_customer_account_branch_account FOREIGN KEY (account_no) REFERENCES account (account_no) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT fk_customer_account_branch_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE RESTRICT ON UPDATE CASCADE
