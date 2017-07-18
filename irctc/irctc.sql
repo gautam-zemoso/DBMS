@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS customer_unreserved_ticket(
 	modified_by_id INT DEFAULT NULL, 
 	last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	KEY idx_fk_customer_id (customer_id),
-	KEY idx_fk_ticket_id (ticket_id),
+	CONSTRAINT UNIQUE uk_ticket_id (ticket_id),
 	CONSTRAINT fk_customer_unreserved_ticket_ticket FOREIGN KEY (ticket_id) REFERENCES ticket (ticket_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT fk_customer_unreserved_ticket_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
@@ -83,9 +83,9 @@ CREATE TABLE IF NOT EXISTS customer_reserved_train_ticket(
 	created_by_id INT NOT NULL, 
 	modified_by_id INT DEFAULT NULL, 
 	last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	KEY idx_fk_customer_id (customer_id),
-	KEY idx_fk_ticket_id (ticket_id),
-	KEY idx_fk_train_no (train_no),
+	CONSTRAINT UNIQUE uk_customer_id (customer_id),
+	CONSTRAINT UNIQUE uk_ticket_id (ticket_id),
+	KEY idx_fk_ticket_train (train_no),
 	CONSTRAINT fk_customer_reserved_train_ticke_ticket FOREIGN KEY (ticket_id) REFERENCES ticket (ticket_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT fk_customer_reserved_train_ticke_customer FOREIGN KEY (customer_id) REFERENCES customer (customer_id) ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT fk_customer_reserved_train_ticke_train FOREIGN KEY (train_no) REFERENCES train (train_no) ON DELETE RESTRICT ON UPDATE CASCADE
